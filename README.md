@@ -2,8 +2,8 @@
 
 Public company site for **Metric West Development Solutions** (developer/operator of Case-Flo Pro).
 
-- Domain (planned): https://www.metricwestds.com  
-- Contact (planned): ryan.ruble@metricwestds.com  
+- Domain: https://www.metricwestds.com  
+- Contact: ryan.ruble@metricwestds.com  
 - This site does **not** host PHI or Case-Flo app login.
 
 ## Local
@@ -23,9 +23,7 @@ Output is in `dist/` for static hosting (Cloudflare Pages, Netlify, Firebase Hos
 
 ## Still to add
 
-- Phone number  
-- DNS for `metricwestds.com` pointing at the host  
-- Email on `@metricwestds.com` after DNS/MX  
+- Optional: redirect bare `metricwestds.com` → `www` (Namecheap URL Redirect)  
 - Optional: refined logo / brand assets  
 
 ## Privacy note
