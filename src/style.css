@@ -260,14 +260,38 @@ a:hover {
   color: rgba(244, 250, 247, 0.75);
 }
 
+.demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
 .product .btn.primary {
   background: #fff;
   color: var(--accent-deep);
-  margin-top: 0.5rem;
 }
 
 .product .btn.primary:hover {
   background: #e8f5f0;
+  color: var(--accent-deep);
+}
+
+.product .btn.ghost {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.product .btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.demo-hint {
+  margin: 0.85rem 0 0;
+  font-size: 0.88rem;
+  color: rgba(244, 250, 247, 0.72);
 }
 
 .contact-list {
