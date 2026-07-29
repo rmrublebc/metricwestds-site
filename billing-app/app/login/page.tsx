@@ -18,37 +18,48 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const supabase = createClient();
-    const { error: signError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    setLoading(false);
-    if (signError) {
-      setError(signError.message);
-      return;
-    }
+    try {
+      const supabase = createClient();
+      const { error: signError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (signError) {
+        setError(signError.message);
+        return;
+      }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      setError("Could not load user.");
-      return;
-    }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setError("Could not load user.");
+        return;
+      }
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
 
-    if (next) {
-      router.push(next);
-      return;
+      if (next) {
+        router.push(next);
+        return;
+      }
+      router.push(profile?.role === "admin" ? "/admin" : "/portal");
+      router.refresh();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Sign in failed. Please try again.";
+      setError(
+        message.includes("Failed to fetch")
+          ? "Could not reach Supabase (Failed to fetch). Check Vercel env vars NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then redeploy."
+          : message,
+      );
+    } finally {
+      setLoading(false);
     }
-    router.push(profile?.role === "admin" ? "/admin" : "/portal");
-    router.refresh();
   }
 
   return (
