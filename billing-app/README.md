@@ -36,13 +36,21 @@ curl -X POST http://localhost:3000/api/admin/bootstrap ^
 
 ## Flow
 
-1. Admin invites agency (gets invite link)
+1. Admin invites agency — Paubox emails the invite link (backup link still shown in admin)
 2. Agency opens `/invite/[token]`, sets password
 3. Admin opens agency → **Start monthly invoicing**
 4. Stripe emails invoice; agency pays from `/portal` via Pay now
 
-## Webhook (later)
+## Paubox (invite email)
 
-Stripe CLI or Dashboard → endpoint  
-`https://YOUR_DOMAIN/api/webhooks/stripe`  
+In [Paubox Email API → Settings](https://next.paubox.com/emailapi/settings), open your verified domain (e.g. `metricwestds.com`), add an API key, then set:
+
+- `PAUBOX_API_KEY`
+- `PAUBOX_FROM_EMAIL` (must be on that verified domain, e.g. `ryan.ruble@metricwestds.com`)
+- optional `PAUBOX_REPLY_TO`
+
+## Webhook
+
+Stripe Dashboard → endpoint  
+`https://portal.metricwestds.com/api/webhooks/stripe`  
 Events: `customer.subscription.*`, `invoice.paid`

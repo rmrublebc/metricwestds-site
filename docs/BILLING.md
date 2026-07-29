@@ -14,9 +14,9 @@ Add more tier prices later (11–20, etc.) on the same product.
 
 ### Flow
 
-1. You invite an agency (admin on metricwestds.com)
+1. You invite an agency (admin portal) — Paubox emails the invite link
 2. Agency creates portal password via invite link
-3. Subscription uses Stripe Checkout (prebuilt)
+3. Admin starts monthly invoicing (`send_invoice`)
 4. Stripe sends monthly invoices; agency pays from portal (or invoice link)
 5. Case-Flo access stays manual/separate for now
 

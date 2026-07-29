@@ -1,4 +1,5 @@
 import { requireAdminApi } from "@/lib/auth";
+import { sendAgencyInviteEmail } from "@/lib/paubox";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { STARTER_PRODUCT } from "@/lib/stripe";
 import { NextResponse } from "next/server";
@@ -72,7 +73,26 @@ export async function POST(request: Request) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     const inviteUrl = `${siteUrl}/invite/${invite.token}`;
 
-    return NextResponse.json({ agencyId: agency.id, inviteUrl });
+    let emailSent = false;
+    let emailError: string | null = null;
+    try {
+      await sendAgencyInviteEmail({
+        to: billingEmail,
+        agencyName: name,
+        contactName: contactName || undefined,
+        inviteUrl,
+      });
+      emailSent = true;
+    } catch (err) {
+      emailError = err instanceof Error ? err.message : "Could not send invite email.";
+    }
+
+    return NextResponse.json({
+      agencyId: agency.id,
+      inviteUrl,
+      emailSent,
+      emailError,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unexpected error";
     return NextResponse.json({ error: message }, { status: 500 });

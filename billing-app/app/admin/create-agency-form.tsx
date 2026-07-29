@@ -10,6 +10,8 @@ export function CreateAgencyForm() {
   const [contactName, setContactName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: FormEvent) {
@@ -17,6 +19,8 @@ export function CreateAgencyForm() {
     setLoading(true);
     setError(null);
     setInviteUrl(null);
+    setEmailSent(false);
+    setEmailError(null);
 
     const res = await fetch("/api/admin/agencies", {
       method: "POST",
@@ -30,6 +34,8 @@ export function CreateAgencyForm() {
       return;
     }
     setInviteUrl(data.inviteUrl);
+    setEmailSent(Boolean(data.emailSent));
+    setEmailError(data.emailError || null);
     setName("");
     setBillingEmail("");
     setContactName("");
@@ -77,7 +83,9 @@ export function CreateAgencyForm() {
       {error ? <p className="md:col-span-2 text-sm text-[#8a1f1f]">{error}</p> : null}
       {inviteUrl ? (
         <p className="md:col-span-2 rounded-lg bg-[rgba(31,111,91,0.1)] p-3 text-sm">
-          Invite created. Share this link if email is not configured yet:
+          {emailSent
+            ? "Invite emailed via Paubox. Backup link (in case they need it):"
+            : `Invite created, but email was not sent${emailError ? `: ${emailError}` : "."} Share this link manually:`}
           <br />
           <a href={inviteUrl}>{inviteUrl}</a>
         </p>
