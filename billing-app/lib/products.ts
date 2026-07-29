@@ -1,5 +1,3 @@
-import { formatUsdFromCents } from "@/lib/money";
-
 export type CaseFloProduct = {
   key: string;
   label: string;
