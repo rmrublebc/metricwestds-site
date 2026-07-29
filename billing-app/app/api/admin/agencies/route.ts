@@ -1,7 +1,7 @@
 import { requireAdminApi } from "@/lib/auth";
 import { sendAgencyInviteEmail } from "@/lib/paubox";
+import { getProductByKey, listConfiguredProducts, STARTER_PRODUCT } from "@/lib/products";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { STARTER_PRODUCT } from "@/lib/stripe";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -15,10 +15,24 @@ export async function POST(request: Request) {
     const name = String(body.name || "").trim();
     const billingEmail = String(body.billingEmail || "").trim().toLowerCase();
     const contactName = String(body.contactName || "").trim();
+    const productKey = String(body.productKey || STARTER_PRODUCT.key).trim();
 
     if (!name || !billingEmail) {
       return NextResponse.json(
         { error: "Agency name and billing email are required." },
+        { status: 400 },
+      );
+    }
+
+    const product = getProductByKey(productKey);
+    if (!product) {
+      const available = listConfiguredProducts()
+        .map((p) => p.key)
+        .join(", ");
+      return NextResponse.json(
+        {
+          error: `Unknown or unconfigured product tier "${productKey}". Configured: ${available || "none"}.`,
+        },
         { status: 400 },
       );
     }
@@ -62,11 +76,11 @@ export async function POST(request: Request) {
 
     await admin.from("agency_subscriptions").insert({
       agency_id: agency.id,
-      product_key: STARTER_PRODUCT.key,
-      product_label: STARTER_PRODUCT.label,
-      stripe_price_id: STARTER_PRODUCT.priceId,
-      monthly_amount_cents: STARTER_PRODUCT.monthlyAmountCents,
-      seat_band: STARTER_PRODUCT.seatBand,
+      product_key: product.key,
+      product_label: product.label,
+      stripe_price_id: product.priceId,
+      monthly_amount_cents: product.monthlyAmountCents,
+      seat_band: product.seatBand,
       status: "incomplete",
     });
 
@@ -92,6 +106,7 @@ export async function POST(request: Request) {
       inviteUrl,
       emailSent,
       emailError,
+      productKey: product.key,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unexpected error";

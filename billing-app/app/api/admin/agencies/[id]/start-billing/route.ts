@@ -1,6 +1,7 @@
 import { requireAdminApi } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getStripe, STARTER_PRODUCT } from "@/lib/stripe";
+import { getProductByKey, STARTER_PRODUCT } from "@/lib/products";
+import { getStripe } from "@/lib/stripe";
 import { NextResponse } from "next/server";
 
 export async function POST(
@@ -34,6 +35,10 @@ export async function POST(
       return NextResponse.json({ error: "Billing already started." }, { status: 400 });
     }
 
+    const product =
+      getProductByKey(existingSub?.product_key || STARTER_PRODUCT.key) || STARTER_PRODUCT;
+    const priceId = existingSub?.stripe_price_id || product.priceId;
+
     let customerId = agency.stripe_customer_id as string | null;
     if (!customerId) {
       const customer = await stripe.customers.create({
@@ -53,12 +58,12 @@ export async function POST(
 
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
-      items: [{ price: existingSub?.stripe_price_id || STARTER_PRODUCT.priceId }],
+      items: [{ price: priceId }],
       collection_method: "send_invoice",
       days_until_due: 14,
       metadata: {
         agency_id: agency.id,
-        product_key: STARTER_PRODUCT.key,
+        product_key: product.key,
       },
     });
 
@@ -71,6 +76,11 @@ export async function POST(
       await admin
         .from("agency_subscriptions")
         .update({
+          product_key: product.key,
+          product_label: product.label,
+          stripe_price_id: priceId,
+          monthly_amount_cents: product.monthlyAmountCents,
+          seat_band: product.seatBand,
           stripe_subscription_id: subscription.id,
           status: subscription.status === "active" ? "active" : "incomplete",
           current_period_end: periodEnd,
@@ -79,12 +89,12 @@ export async function POST(
     } else {
       await admin.from("agency_subscriptions").insert({
         agency_id: agency.id,
-        product_key: STARTER_PRODUCT.key,
-        product_label: STARTER_PRODUCT.label,
-        stripe_price_id: STARTER_PRODUCT.priceId,
+        product_key: product.key,
+        product_label: product.label,
+        stripe_price_id: priceId,
         stripe_subscription_id: subscription.id,
-        monthly_amount_cents: STARTER_PRODUCT.monthlyAmountCents,
-        seat_band: STARTER_PRODUCT.seatBand,
+        monthly_amount_cents: product.monthlyAmountCents,
+        seat_band: product.seatBand,
         status: subscription.status === "active" ? "active" : "incomplete",
         current_period_end: periodEnd,
       });
@@ -112,6 +122,7 @@ export async function POST(
     return NextResponse.json({
       subscriptionId: subscription.id,
       customerId,
+      productKey: product.key,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unexpected error";

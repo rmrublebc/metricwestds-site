@@ -6,9 +6,11 @@ import { useState } from "react";
 export function StartBillingButton({
   agencyId,
   disabled,
+  amountLabel,
 }: {
   agencyId: string;
   disabled?: boolean;
+  amountLabel?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -32,6 +34,8 @@ export function StartBillingButton({
     router.refresh();
   }
 
+  const labelAmount = amountLabel || "$750";
+
   return (
     <div className="space-y-2">
       <button
@@ -40,7 +44,11 @@ export function StartBillingButton({
         disabled={disabled || loading}
         onClick={startBilling}
       >
-        {disabled ? "Billing already started" : loading ? "Starting…" : "Start monthly invoicing ($750)"}
+        {disabled
+          ? "Billing already started"
+          : loading
+            ? "Starting…"
+            : `Start monthly invoicing (${labelAmount})`}
       </button>
       {error ? <p className="text-sm text-[#8a1f1f]">{error}</p> : null}
       {message ? <p className="text-sm text-[var(--accent-deep)]">{message}</p> : null}

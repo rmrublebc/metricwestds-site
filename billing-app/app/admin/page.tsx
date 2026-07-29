@@ -1,5 +1,7 @@
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { formatUsdFromCents } from "@/lib/money";
+import { listConfiguredProducts, listProductCatalog } from "@/lib/products";
 import Link from "next/link";
 import { CreateAgencyForm } from "./create-agency-form";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -7,6 +9,8 @@ import { SignOutButton } from "@/components/sign-out-button";
 export default async function AdminPage() {
   await requireAdmin();
   const supabase = await createClient();
+  const products = listConfiguredProducts();
+  const catalog = listProductCatalog();
 
   const { data: agencies } = await supabase
     .from("agencies")
@@ -35,10 +39,39 @@ export default async function AdminPage() {
       <section className="card mb-8">
         <h2 className="mt-0 text-xl font-semibold">Invite an agency</h2>
         <p className="text-sm text-[var(--ink-soft)]">
-          Creates the agency, emails an invite link, and prepares Case-Flo Pro Starter
-          ($750/mo) for invoicing.
+          Creates the agency, emails an invite link, and prepares the selected Case-Flo Pro
+          plan for monthly invoicing.
         </p>
-        <CreateAgencyForm />
+        <CreateAgencyForm
+          products={products.map((p) => ({
+            key: p.key,
+            label: p.label,
+            seatBand: p.seatBand,
+            monthlyAmountCents: p.monthlyAmountCents,
+          }))}
+        />
+      </section>
+
+      <section className="card mb-8">
+        <h2 className="mt-0 text-xl font-semibold">Plan tiers</h2>
+        <p className="text-sm text-[var(--ink-soft)]">
+          Only tiers with a Stripe price ID in Vercel appear in the invite form.
+        </p>
+        <ul className="m-0 list-none space-y-2 p-0">
+          {catalog.map((tier) => (
+            <li
+              key={tier.key}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--line)] bg-white/60 px-3 py-2 text-sm"
+            >
+              <span>
+                {tier.label} · {formatUsdFromCents(tier.monthlyAmountCents)}/mo
+              </span>
+              <span className={`badge ${tier.configured ? "" : "badge-warn"}`}>
+                {tier.configured ? "Ready" : `Add ${tier.envKey}`}
+              </span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="card">
@@ -72,7 +105,7 @@ export default async function AdminPage() {
                           {sub.product_label}
                           <br />
                           <span className="text-sm text-[var(--ink-soft)]">
-                            ${(sub.monthly_amount_cents / 100).toFixed(0)}/mo · {sub.status}
+                            {formatUsdFromCents(sub.monthly_amount_cents)}/mo · {sub.status}
                           </span>
                         </>
                       ) : (

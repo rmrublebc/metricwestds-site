@@ -2,12 +2,21 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatUsdFromCents } from "@/lib/money";
 
-export function CreateAgencyForm() {
+export type ProductOption = {
+  key: string;
+  label: string;
+  seatBand: string;
+  monthlyAmountCents: number;
+};
+
+export function CreateAgencyForm({ products }: { products: ProductOption[] }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [billingEmail, setBillingEmail] = useState("");
   const [contactName, setContactName] = useState("");
+  const [productKey, setProductKey] = useState(products[0]?.key || "caseflo_starter");
   const [error, setError] = useState<string | null>(null);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState(false);
@@ -25,7 +34,7 @@ export function CreateAgencyForm() {
     const res = await fetch("/api/admin/agencies", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, billingEmail, contactName }),
+      body: JSON.stringify({ name, billingEmail, contactName, productKey }),
     });
     const data = await res.json();
     setLoading(false);
@@ -80,6 +89,30 @@ export function CreateAgencyForm() {
           onChange={(e) => setContactName(e.target.value)}
         />
       </div>
+      <div className="md:col-span-2">
+        <label className="label" htmlFor="productKey">
+          Plan tier
+        </label>
+        <select
+          id="productKey"
+          className="input"
+          required
+          value={productKey}
+          onChange={(e) => setProductKey(e.target.value)}
+          disabled={!products.length}
+        >
+          {products.map((product) => (
+            <option key={product.key} value={product.key}>
+              {product.label} — {formatUsdFromCents(product.monthlyAmountCents)}/mo
+            </option>
+          ))}
+        </select>
+        {!products.length ? (
+          <p className="mt-2 text-sm text-[#8a1f1f]">
+            No Stripe price IDs configured. Set STRIPE_PRICE_CASEFLO_* env vars.
+          </p>
+        ) : null}
+      </div>
       {error ? <p className="md:col-span-2 text-sm text-[#8a1f1f]">{error}</p> : null}
       {inviteUrl ? (
         <p className="md:col-span-2 rounded-lg bg-[rgba(31,111,91,0.1)] p-3 text-sm">
@@ -91,7 +124,7 @@ export function CreateAgencyForm() {
         </p>
       ) : null}
       <div className="md:col-span-2">
-        <button className="btn btn-primary" type="submit" disabled={loading}>
+        <button className="btn btn-primary" type="submit" disabled={loading || !products.length}>
           {loading ? "Creating…" : "Create agency & invite"}
         </button>
       </div>

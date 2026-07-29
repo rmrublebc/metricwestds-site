@@ -4,6 +4,8 @@ import { getStripe } from "@/lib/stripe";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StartBillingButton } from "./start-billing-button";
+import { DeleteAgencyButton } from "./delete-agency-button";
+import { formatUsdFromCents } from "@/lib/money";
 import { SignOutButton } from "@/components/sign-out-button";
 
 export default async function AgencyDetailPage({
@@ -91,7 +93,7 @@ export default async function AgencyDetailPage({
           <p className="label">Subscription</p>
           {sub ? (
             <p className="m-0">
-              {sub.product_label} · ${(sub.monthly_amount_cents / 100).toFixed(0)}/mo ·{" "}
+              {sub.product_label} · {formatUsdFromCents(sub.monthly_amount_cents)}/mo ·{" "}
               <span className="badge">{sub.status}</span>
             </p>
           ) : (
@@ -107,8 +109,17 @@ export default async function AgencyDetailPage({
             </a>
           </div>
         ) : null}
-        <div className="md:col-span-2">
-          <StartBillingButton agencyId={agency.id} disabled={Boolean(sub?.stripe_subscription_id)} />
+        <div className="md:col-span-2 flex flex-wrap items-start gap-3">
+          <StartBillingButton
+            agencyId={agency.id}
+            disabled={Boolean(sub?.stripe_subscription_id)}
+            amountLabel={
+              sub?.monthly_amount_cents
+                ? formatUsdFromCents(sub.monthly_amount_cents)
+                : undefined
+            }
+          />
+          <DeleteAgencyButton agencyId={agency.id} agencyName={agency.name} />
         </div>
       </section>
 
