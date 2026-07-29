@@ -1,11 +1,15 @@
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
+import { listConfiguredProducts } from "@/lib/products";
+import { formatUsdFromCents } from "@/lib/money";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StartBillingButton } from "./start-billing-button";
 import { DeleteAgencyButton } from "./delete-agency-button";
-import { formatUsdFromCents } from "@/lib/money";
+import { ChangePlanForm } from "./change-plan-form";
+import { ResendInviteButton } from "./resend-invite-button";
+import { VoidInvoiceButton } from "./void-invoice-button";
 import { SignOutButton } from "@/components/sign-out-button";
 
 export default async function AgencyDetailPage({
@@ -16,6 +20,7 @@ export default async function AgencyDetailPage({
   await requireAdmin();
   const { id } = await params;
   const supabase = await createClient();
+  const products = listConfiguredProducts();
 
   const { data: agency } = await supabase
     .from("agencies")
@@ -64,6 +69,7 @@ export default async function AgencyDetailPage({
     )[0];
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const billingStarted = Boolean(sub?.stripe_subscription_id);
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
@@ -100,19 +106,31 @@ export default async function AgencyDetailPage({
             <p className="m-0 text-[var(--ink-soft)]">No subscription row yet.</p>
           )}
         </div>
+        <div className="md:col-span-2">
+          <ChangePlanForm
+            agencyId={agency.id}
+            currentProductKey={sub?.product_key || products[0]?.key || "caseflo_starter"}
+            disabled={billingStarted}
+            products={products.map((p) => ({
+              key: p.key,
+              label: p.label,
+              monthlyAmountCents: p.monthlyAmountCents,
+            }))}
+          />
+        </div>
         {invite && !invite.accepted_at ? (
           <div className="md:col-span-2 rounded-lg bg-[rgba(31,111,91,0.08)] p-3 text-sm">
-            Pending invite link:
-            <br />
-            <a href={`${siteUrl}/invite/${invite.token}`}>
-              {siteUrl}/invite/{invite.token}
-            </a>
+            <ResendInviteButton
+              agencyId={agency.id}
+              inviteUrl={`${siteUrl}/invite/${invite.token}`}
+              expiresAt={invite.expires_at}
+            />
           </div>
         ) : null}
         <div className="md:col-span-2 flex flex-wrap items-start gap-3">
           <StartBillingButton
             agencyId={agency.id}
-            disabled={Boolean(sub?.stripe_subscription_id)}
+            disabled={billingStarted}
             amountLabel={
               sub?.monthly_amount_cents
                 ? formatUsdFromCents(sub.monthly_amount_cents)
@@ -142,14 +160,20 @@ export default async function AgencyDetailPage({
                 <td>
                   <span className="badge">{inv.status}</span>
                 </td>
-                <td>
+                <td className="space-x-2">
                   {inv.hosted_invoice_url ? (
                     <a className="btn btn-ghost" href={inv.hosted_invoice_url} target="_blank" rel="noreferrer">
                       Open
                     </a>
-                  ) : (
-                    "—"
-                  )}
+                  ) : null}
+                  <VoidInvoiceButton
+                    agencyId={agency.id}
+                    invoiceId={inv.id}
+                    status={inv.status}
+                  />
+                  {!inv.hosted_invoice_url && inv.status !== "open" && inv.status !== "draft"
+                    ? "—"
+                    : null}
                 </td>
               </tr>
             ))}

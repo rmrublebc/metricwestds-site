@@ -421,6 +421,20 @@ a:hover {
   font-weight: 600;
 }
 
+.contact-portal {
+  margin-top: 2rem;
+  max-width: 32rem;
+  display: grid;
+  gap: 0.9rem;
+  justify-items: start;
+}
+
+.contact-portal p {
+  margin: 0;
+  color: var(--ink-soft);
+  max-width: 28rem;
+}
+
 .placeholder {
   color: var(--sand);
   font-weight: 600;

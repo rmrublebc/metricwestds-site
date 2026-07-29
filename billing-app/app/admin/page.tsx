@@ -122,8 +122,14 @@ export default async function AdminPage() {
               })}
               {!agencies?.length ? (
                 <tr>
-                  <td colSpan={5} className="text-[var(--ink-soft)]">
-                    No agencies yet.
+                  <td colSpan={5}>
+                    <div className="py-6 text-center">
+                      <p className="m-0 text-base font-semibold">Invite your first agency</p>
+                      <p className="mt-2 mb-0 text-sm text-[var(--ink-soft)]">
+                        Use the form above to create an agency, choose a plan tier, and email
+                        their portal invite.
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : null}
