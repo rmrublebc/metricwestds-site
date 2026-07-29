@@ -20,9 +20,6 @@ export default function HomePage() {
         <Link className="btn btn-ghost" href="/admin">
           Metric West admin
         </Link>
-        <a className="btn btn-ghost" href="https://www.metricwestds.com">
-          Company site
-        </a>
       </div>
     </main>
   );
