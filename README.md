@@ -1,10 +1,8 @@
-# Metric West Development Solutions — website
-
-Public company site for **Metric West Development Solutions** (developer/operator of Case-Flo Pro).
+Public company site for **Metric West Development Solutions** (developer/operator of Case-Flo Pro and Statiscribe).
 
 - Domain: https://www.metricwestds.com  
 - Contact: ryan.ruble@metricwestds.com  
-- This site does **not** host PHI or Case-Flo app login.
+- This site does **not** host PHI or product app login.
 
 ## Local
 
@@ -30,4 +28,6 @@ Separate Supabase project: **Metric West** (not Case-Flo).
 
 ## Privacy note
 
-Marketing/company site only. Clinical product: https://www.caseflo-pro.com
+Marketing/company site only. Products:
+- Case-Flo Pro: https://www.caseflo-pro.com
+- Statiscribe: https://www.statiscribe.com

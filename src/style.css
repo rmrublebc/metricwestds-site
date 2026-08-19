@@ -96,8 +96,10 @@ a:hover {
 
 .nav {
   display: flex;
-  gap: 1.15rem;
-  font-size: 0.92rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.85rem 1.05rem;
+  font-size: 0.9rem;
 }
 
 .nav a {
@@ -357,6 +359,12 @@ a:hover {
   color: #fff;
 }
 
+.product-statiscribe {
+  background:
+    linear-gradient(125deg, rgba(12, 74, 78, 0.94), rgba(15, 118, 110, 0.88)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M0 60h120M60 0v120' stroke='rgba(255,255,255,0.08)' stroke-width='1'/%3E%3C/svg%3E");
+}
+
 .demo-hint {
   margin: 0.85rem 0 0;
   font-size: 0.88rem;
@@ -368,6 +376,10 @@ a:hover {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.product-shots-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .product-shot {
@@ -527,6 +539,10 @@ a:hover {
   }
 
   .product-shots {
+    grid-template-columns: 1fr;
+  }
+
+  .product-shots-3 {
     grid-template-columns: 1fr;
   }
 }
