@@ -371,8 +371,6 @@ a:hover {
   height: auto;
   margin: 0 0 1.25rem;
   border-radius: 0.85rem;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
-  background: #000;
 }
 
 .demo-hint {
@@ -504,7 +502,6 @@ a:hover {
   height: 3.25rem;
   width: auto;
   border-radius: 0.45rem;
-  background: #000;
 }
 
 .legal {
