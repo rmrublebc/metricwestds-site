@@ -367,10 +367,9 @@ a:hover {
 
 .product-brand-logo {
   display: block;
-  width: min(220px, 55vw);
+  width: min(280px, 70vw);
   height: auto;
   margin: 0 0 1.25rem;
-  border-radius: 0.85rem;
 }
 
 .demo-hint {
