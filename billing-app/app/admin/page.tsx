@@ -28,13 +28,40 @@ export default async function AdminPage() {
           </p>
           <h1 className="mt-1 text-3xl font-bold">Agencies & billing</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <a
+            className="btn btn-ghost"
+            href="https://statiscribe.com/ops"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Statiscribe ops
+          </a>
           <Link className="btn btn-ghost" href="/">
             Portal home
           </Link>
           <SignOutButton />
         </div>
       </header>
+
+      <section className="card mb-8">
+        <h2 className="mt-0 text-xl font-semibold">Statiscribe</h2>
+        <p className="text-sm text-[var(--ink-soft)]">
+          Secure messaging control console (accounts, announcements, HIPAA
+          compliance). Opens in a new tab — sign in with your Metric West
+          Statiscribe ops email if prompted.
+        </p>
+        <p className="mt-4">
+          <a
+            className="btn"
+            href="https://statiscribe.com/ops"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open Statiscribe ops
+          </a>
+        </p>
+      </section>
 
       <section className="card mb-8">
         <h2 className="mt-0 text-xl font-semibold">Invite an agency</h2>
