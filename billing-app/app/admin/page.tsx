@@ -12,6 +12,16 @@ export default async function AdminPage() {
   const products = listConfiguredProducts();
   const catalog = listProductCatalog();
 
+  const stripeBase = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live")
+    ? "https://dashboard.stripe.com"
+    : "https://dashboard.stripe.com/test";
+  const caseFloStripeUrl =
+    process.env.STRIPE_DASHBOARD_URL_CASEFLO?.trim() ||
+    `${stripeBase}/payments`;
+  const statiscribeStripeUrl =
+    process.env.STRIPE_DASHBOARD_URL_STATISCRIBE?.trim() ||
+    `${stripeBase}/subscriptions`;
+
   const { data: agencies } = await supabase
     .from("agencies")
     .select(
@@ -45,21 +55,43 @@ export default async function AdminPage() {
       </header>
 
       <section className="card mb-8">
-        <h2 className="mt-0 text-xl font-semibold">Statiscribe</h2>
+        <h2 className="mt-0 text-xl font-semibold">Operations</h2>
         <p className="text-sm text-[var(--ink-soft)]">
-          Secure messaging control console (accounts, announcements, HIPAA
-          compliance). Opens in a new tab — sign in with your Metric West
-          Statiscribe ops email if prompted.
+          Jump to Statiscribe controls and Stripe for Case Flo Pro and
+          Statiscribe billing (opens in a new tab).
         </p>
-        <p className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-2">
           <a
             className="btn"
             href="https://statiscribe.com/ops"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Open Statiscribe ops
+            Statiscribe ops
           </a>
+          <a
+            className="btn btn-ghost"
+            href={caseFloStripeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Stripe · Case Flo Pro
+          </a>
+          <a
+            className="btn btn-ghost"
+            href={statiscribeStripeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Stripe · Statiscribe
+          </a>
+        </div>
+        <p className="mt-3 text-xs text-[var(--ink-soft)]">
+          Dashboard links follow this portal’s Stripe mode (
+          {process.env.STRIPE_SECRET_KEY?.startsWith("sk_live") ? "live" : "test"}
+          ). Override with{" "}
+          <code>STRIPE_DASHBOARD_URL_CASEFLO</code> /{" "}
+          <code>STRIPE_DASHBOARD_URL_STATISCRIBE</code> if accounts differ.
         </p>
       </section>
 
